@@ -1,14 +1,21 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
-const port = 3000;
+const port = 80;
+
+const conn = require('./db');
 
 app.use(express.json());
 app.use(cors({origin: '*'}));
 
 app.get("/", (req, res) => {
-    res.json({
-        message: "ok"
+    conn.query("SELECT * FROM programming_languages", (err, data, fields) => {
+        if (err) {
+            res.json({message: "Sin información"});
+        } 
+
+        res.status(200).json(data);
+
     });
 });
 
