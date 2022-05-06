@@ -31,12 +31,72 @@ app.get("/", (req, res) => {
 });
 
 app.get("/datos", (req, res) => {
-    conn.query("select tipo, valor, date_format(fecha, '%d/%m/%Y %hh:%i:%ss') as fecha from datos_arduino;", (err, data, fields) => {
+    conn.query("select tipo, valor, date_format(fecha, '%d/%m/%Y %H:%i:%s') as fecha from datos_arduino;", (err, data, fields) => {
         if (err) res.json({data: null});
 
         res.status(200).json(data);
     });
 });
+
+app.get("/co2", (req, res) => {
+    conn.query("select tipo, valor, date_format(fecha, '%d/%m/%Y %H:%i:%s') as fecha from datos_arduino where lower(tipo) = 'co2';", (err, data, fields) => {
+        if (err) res.json({data: null});
+
+        res.status(200).json(data);
+    });
+});
+
+app.get("/temp", (req, res) => {
+    conn.query("select tipo, valor, date_format(fecha, '%d/%m/%Y %H:%i:%s') as fecha from datos_arduino where lower(tipo) = 'temp';", (err, data, fields) => {
+        if (err) res.json({data: null});
+
+        res.status(200).json(data);
+    });
+});
+
+app.get("/gas", (req, res) => {
+    conn.query("select tipo, valor, date_format(fecha, '%d/%m/%Y %H:%i:%s') as fecha from datos_arduino where lower(tipo) = 'isGas';", (err, data, fields) => {
+        if (err) res.json({data: null});
+
+        res.status(200).json(data);
+    });
+});
+
+app.get("/chispa", (req, res) => {
+    conn.query("select tipo, valor, date_format(fecha, '%d/%m/%Y %H:%i:%s') as fecha from datos_arduino where lower(tipo) = 'isChispa';", (err, data, fields) => {
+        if (err) res.json({data: null});
+
+        res.status(200).json(data);
+    });
+});
+
+
+app.post("/datos", (req, res) => {
+    let tipo = req.body.tipo;
+    let valor = req.body.valor;
+
+    let moment = require('moment'); // require
+    let fecha = moment().format("YYYY-MM-DD HH:mm:ss"); 
+
+    if (!tipo || !valor) {
+        res.status(502).json({
+            mensaje: 'Los campos tipo y valor son requeridos'
+        });
+    }
+
+    console.log(tipo);
+    console.log(valor);
+    console.log(fecha);
+
+    conn.query(`insert into datos_arduino(tipo, valor, fecha) values ('${tipo}', ${valor}, '${fecha}')`, (err, data, fieds) => {
+        if (err) res.status(500).json({mensaje: 'No se pudo registrar el dato'});
+
+        res.status(201).json({mensaje: 'Dato registrado', fecha_registro: fecha});
+
+    });
+
+});
+
 
 app.listen(port, () => {
     console.log(`Listening on the port ${port}`);
