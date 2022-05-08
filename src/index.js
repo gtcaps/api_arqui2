@@ -97,16 +97,16 @@ app.post("/datos", (req, res) => {
 
 });
 
-app.post("/datos_full", (req, res) => {
-    let datos = req.body.datos;
+app.post("/datos_full/:datos", (req, res) => {
+    let datos = req.params.datos;
 
-    if (!datos ) {
+    if (!datos || datos === "") {
         res.status(502).json({
             mensaje: `Se requiere del campo "datos"`
         });
     }
 
-    let datosSplit = datos.split(" ");
+    let datosSplit = datos.split("-");
 
     if (datosSplit.length === 4) {
         let temperatura = datosSplit[0];
@@ -129,8 +129,8 @@ app.post("/datos_full", (req, res) => {
             });
         });
     }
-
 });
+
 
 app.listen(port, () => {
     console.log(`Listening on the port ${port}`);
