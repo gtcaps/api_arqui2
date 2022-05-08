@@ -97,6 +97,40 @@ app.post("/datos", (req, res) => {
 
 });
 
+app.post("/datos_full", (req, res) => {
+    let datos = req.body.datos;
+
+    if (!datos ) {
+        res.status(502).json({
+            mensaje: `Se requiere del campo "datos"`
+        });
+    }
+
+    let datosSplit = datos.split(" ");
+
+    if (datosSplit.length === 4) {
+        let temperatura = datosSplit[0];
+        let co2 = datosSplit[1];
+        let chispa = datosSplit[2];
+        let gas = datosSplit[3];
+
+        let moment = require('moment'); // require
+        let fecha = moment().format("YYYY-MM-DD HH:mm:ss"); 
+
+        conn.query(`insert into datos_arduino(tipo, valor, fecha) values ('temp', ${temperatura}, '${fecha}'), ('co2', ${co2}, '${fecha}'), ('isChispa', ${chispa}, '${fecha}'), ('isGas', ${gas}, '${fecha}')`, (err, data, fields) => {
+            if (err) res.status(500).json({mensaje: 'No se pudieron registrar los datos'});
+
+            res.status(201).json({
+                mensaje: 'Datos Registrados',
+                temperatura: temperatura,
+                co2: co2,
+                isChispa: chispa,
+                isGas: gas
+            });
+        });
+    }
+
+});
 
 app.listen(port, () => {
     console.log(`Listening on the port ${port}`);
